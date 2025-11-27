@@ -41,6 +41,13 @@ pipeline {
                 sh 'cd smart-appointment-booking-full && docker-compose up -d --build'
             }
         }
+        stage('Deploy to EC2') {
+            steps {
+                sshagent(['jenkins-ec2-key']) {
+                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@18.61.83.99 "cd devops/smart-appointment-booking-full && git pull && docker-compose up -d --build"'
+                }
+            }
+        }
     }
     post {
         success {
