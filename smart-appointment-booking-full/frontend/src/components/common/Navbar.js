@@ -34,7 +34,7 @@ const Navbar = () => {
                 <Button component={Link} to="/admin" color="primary">Admin</Button>
               )}
               <Typography sx={{ mx: 2 }}>Hello, {user?.name}</Typography>
-              <Button onClick={handleLogout} variant="outlined" color="secondary">Logout</Button>
+              <Button onClick={handleLogout} variant="outlined" color="secondary" data-testid="logout-btn">Logout</Button>
             </>
           ) : (
             <>

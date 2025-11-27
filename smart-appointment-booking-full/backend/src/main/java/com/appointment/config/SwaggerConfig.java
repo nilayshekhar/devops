@@ -27,14 +27,14 @@ public class SwaggerConfig {
         .description("REST API for managing appointments with service providers")
         .contact(new Contact()
           .name("Your Name")
-          .email("your.email@example.com")
-          .url("https://github.com/yourusername"))
+          .email("nilayshekhar16@gmail.cn")
+          .url("https://github.com/nilayshekhar"))
         .license(new License()
           .name("MIT License")
           .url("https://opensource.org/licenses/MIT")))
       .servers(List.of(
         new Server().url("http://localhost:8080").description("Local Development Server"),
-        new Server().url("https://your-production-url.com").description("Production Server")
+        new Server().url("https://production-url.com").description("Production Server")
       ));
   }
 }

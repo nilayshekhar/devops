@@ -11,19 +11,16 @@ const authService = {
     return response.data;
   },
 
-  // Login user (mock - implement based on your backend)
+  // Login user (calls backend auth endpoint)
   login: async (email, password) => {
-    // For now, we'll fetch user by email and check password
-    // In production, implement proper authentication endpoint
     try {
-      const response = await api.get(`/users/email/${email}`);
+      const response = await api.post('/auth/login', { email, password });
       if (response.data.success) {
         const user = response.data.data;
-        // Store user data (in production, store JWT token)
         localStorage.setItem('user', JSON.stringify(user));
         return { success: true, data: user };
       }
-      return { success: false, message: 'Invalid credentials' };
+      return { success: false, message: response.data.message || 'Invalid credentials' };
     } catch (error) {
       return { success: false, message: error.response?.data?.message || 'Login failed' };
     }
