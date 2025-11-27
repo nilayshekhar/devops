@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    environment {
+        SONARQUBE_SERVER = 'SonarQube'
+        SONARQUBE_TOKEN = credentials('sonarqube-token')
+    }
+    triggers {
+        cron('H H/6 * * *')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/nilayshekhar/devops.git'
+            }
+        }
+        stage('Backend Build') {
+            steps {
+                dir('backend') {
+                    sh './mvnw clean install'
+                }
+            }
+        }
+        stage('Frontend Build') {
+            steps {
+                dir('frontend') {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                dir('backend') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh './mvnw sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN'
+                    }
+                }
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                sh 'docker-compose build'
+            }
+        }
+        stage('Docker Deploy') {
+            steps {
+                sh 'docker-compose up -d --build'
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Deployment successful! Access the app at http://localhost:8080/'
+        }
+        failure {
+            echo 'Deployment failed.'
+        }
+    }
+}

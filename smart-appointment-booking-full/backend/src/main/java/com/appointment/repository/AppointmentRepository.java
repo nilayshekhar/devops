@@ -16,6 +16,8 @@ import java.util.List;
  */
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+  // Find appointments that are PENDING and in the past
+  List<Appointment> findByStatusAndAppointmentDateTimeBefore(Appointment.Status status, LocalDateTime dateTime);
 
   /**
    * Find all appointments for a specific customer

@@ -76,24 +76,22 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
     MethodArgumentNotValidException ex) {
-
     Map<String, String> errors = new HashMap<>();
-
     ex.getBindingResult().getAllErrors().forEach((error) -> {
       String fieldName = ((FieldError) error).getField();
       String errorMessage = error.getDefaultMessage();
       errors.put(fieldName, errorMessage);
     });
-
     log.error("Validation failed: {}", errors);
-
+    Map<String, Object> errorDetails = new HashMap<>();
+    errorDetails.put("code", "VALIDATION_ERROR");
+    errorDetails.put("errors", errors);
     ApiResponse<Map<String, String>> response = new ApiResponse<>();
     response.setSuccess(false);
     response.setMessage("Validation failed. Please check the provided data.");
-    response.setData(errors);
+    response.setErrors(errorDetails);
     response.setTimestamp(LocalDateTime.now());
     response.setStatusCode(HttpStatus.BAD_REQUEST.value());
-
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 

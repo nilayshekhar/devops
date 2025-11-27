@@ -18,9 +18,9 @@ import java.util.List;
  * REST Controller for User Management
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "User Management", description = "APIs for managing users")
 public class UserController {
 
@@ -28,7 +28,8 @@ public class UserController {
 
   /**
    * Get all users
-   * GET /api/users
+   * GET /api/v1/users
+   * Actors: ADMIN
    */
   @GetMapping
   @Operation(summary = "Get all users", description = "Retrieve list of all users")
@@ -39,7 +40,8 @@ public class UserController {
 
   /**
    * Get user by ID
-   * GET /api/users/{id}
+   * GET /api/v1/users/{id}
+   * Actors: ADMIN, USER
    */
   @GetMapping("/{id}")
   @Operation(summary = "Get user by ID", description = "Retrieve a specific user by ID")
@@ -50,7 +52,8 @@ public class UserController {
 
   /**
    * Create new user
-   * POST /api/users
+   * POST /api/v1/users
+   * Actors: PUBLIC
    */
   @PostMapping
   @Operation(summary = "Create user", description = "Register a new user")

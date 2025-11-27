@@ -1,0 +1,28 @@
+type Appointment {
+  id: ID!
+  customer: User!
+  serviceProvider: User!
+  serviceType: String!
+  appointmentDateTime: String!
+  status: String!
+  notes: String
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  phone: String
+}
+
+type Query {
+  appointments: [Appointment!]!
+  appointment(id: ID!): Appointment
+  users: [User!]!
+  user(id: ID!): User
+}
+
+type Mutation {
+  createAppointment(customerId: ID!, providerId: ID!, serviceType: String!, appointmentDateTime: String!, notes: String): Appointment
+  createUser(name: String!, email: String!, phone: String, password: String!): User
+}

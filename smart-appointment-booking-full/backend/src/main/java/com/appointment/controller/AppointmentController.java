@@ -16,23 +16,39 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * REST Controller for Appointment Management
  * Handles all appointment-related API endpoints
  */
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping("/api/v1/appointments")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "Appointment Management", description = "APIs for managing appointments")
 public class AppointmentController {
+  /**
+   * Get all appointments as a map (id -> AppointmentResponse)
+   * GET /api/v1/appointments/map
+   * Actors: ADMIN, PROVIDER
+   */
+  @GetMapping("/map")
+  @Operation(summary = "Get all appointments as map", description = "Retrieve all appointments as a map of id to details")
+  public ResponseEntity<ApiResponse<Map<Long, AppointmentResponse>>> getAllAppointmentsMap() {
+    List<AppointmentResponse> appointments = appointmentService.getAllAppointments();
+    Map<Long, AppointmentResponse> map = appointments.stream()
+      .collect(Collectors.toMap(AppointmentResponse::getId, a -> a));
+    return ResponseEntity.ok(new ApiResponse<>(true, "Appointments map retrieved successfully", map));
+  }
 
   private final AppointmentService appointmentService;
 
   /**
    * Get all appointments
-   * GET /api/appointments
+   * GET /api/v1/appointments
+   * Actors: ADMIN, PROVIDER
    */
   @GetMapping
   @Operation(summary = "Get all appointments", description = "Retrieve list of all appointments")
@@ -43,7 +59,8 @@ public class AppointmentController {
 
   /**
    * Get appointment by ID
-   * GET /api/appointments/{id}
+   * GET /api/v1/appointments/{id}
+   * Actors: ADMIN, PROVIDER, USER
    */
   @GetMapping("/{id}")
   @Operation(summary = "Get appointment by ID", description = "Retrieve a specific appointment by its ID")
@@ -54,7 +71,8 @@ public class AppointmentController {
 
   /**
    * Create new appointment
-   * POST /api/appointments
+   * POST /api/v1/appointments
+   * Actors: USER
    */
   @PostMapping
   @Operation(summary = "Create appointment", description = "Book a new appointment")
@@ -146,9 +164,14 @@ public class AppointmentController {
   @Operation(summary = "Update status", description = "Change appointment status")
   public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
     @PathVariable Long id,
-    @RequestParam Appointment.Status status) {
-    AppointmentResponse appointment = appointmentService.updateAppointmentStatus(id, status);
-    return ResponseEntity.ok(new ApiResponse<>(true, "Status updated successfully", appointment));
+    @RequestParam String status) {
+    try {
+      Appointment.Status statusEnum = Appointment.Status.valueOf(status);
+      AppointmentResponse appointment = appointmentService.updateAppointmentStatus(id, statusEnum);
+      return ResponseEntity.ok(new ApiResponse<>(true, "Status updated successfully", appointment));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Invalid status value: " + status, null));
+    }
   }
 
   /**

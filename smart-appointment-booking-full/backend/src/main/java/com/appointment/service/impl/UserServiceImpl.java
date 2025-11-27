@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 /**
  * Implementation of UserService
@@ -30,7 +31,9 @@ public class UserServiceImpl implements UserService {
   @Transactional(readOnly = true)
   public List<UserResponse> getAllUsers() {
     log.info("Fetching all users");
+    // Default sorting: most recently created users first
     return userRepository.findAll().stream()
+      .sorted(Comparator.comparing(User::getCreatedAt).reversed())
       .map(this::convertToResponse)
       .collect(Collectors.toList());
   }

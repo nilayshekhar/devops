@@ -3,7 +3,7 @@ import api from './api';
 const authService = {
   // Register new user
   register: async (userData) => {
-    const response = await api.post('/users', userData);
+  const response = await api.post('/v1/users', userData);
     if (response.data.success) {
       // Store user data
       localStorage.setItem('user', JSON.stringify(response.data.data));
@@ -14,7 +14,7 @@ const authService = {
   // Login user (calls backend auth endpoint)
   login: async (email, password) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+  const response = await api.post('/v1/auth/login', { email, password });
       if (response.data.success) {
         const user = response.data.data;
         localStorage.setItem('user', JSON.stringify(user));

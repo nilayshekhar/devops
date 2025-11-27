@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 /**
  * Implementation of AppointmentService
@@ -36,7 +37,10 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Transactional(readOnly = true)
   public List<AppointmentResponse> getAllAppointments() {
     log.info("Fetching all appointments");
+    // Default sorting: most recent appointment first, then by created user
     return appointmentRepository.findAll().stream()
+      .sorted(Comparator.comparing(Appointment::getAppointmentDateTime).reversed()
+        .thenComparing(a -> a.getCustomer().getId(), Comparator.reverseOrder()))
       .map(this::convertToResponse)
       .collect(Collectors.toList());
   }

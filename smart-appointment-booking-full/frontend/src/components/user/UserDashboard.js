@@ -13,6 +13,7 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [info, setInfo] = useState('');
 
   useEffect(() => {
     fetchAppointments();
@@ -37,7 +38,18 @@ const UserDashboard = () => {
       }
 
       if (allAppointmentsResponse.success) {
-        setAppointments(allAppointmentsResponse.data || []);
+        const all = allAppointmentsResponse.data || [];
+        setAppointments(all);
+        // Check for expired unconfirmed appointments that may have been auto-removed
+        const now = new Date();
+        const expiredUnconfirmed = all.filter(
+          apt => apt.status === 'PENDING' && new Date(apt.appointmentDateTime) < now
+        );
+        if (expiredUnconfirmed.length > 0) {
+          setInfo(`${expiredUnconfirmed.length} expired unconfirmed appointment(s) have been auto-removed.`);
+        } else {
+          setInfo('');
+        }
       }
 
       if (upcomingResponse.success) {
@@ -65,10 +77,17 @@ const UserDashboard = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await appointmentService.updateAppointmentStatus(id, newStatus);
-      fetchAppointments(); // Refresh the list
+      const result = await appointmentService.updateAppointmentStatus(id, newStatus);
+      if (result && result.success) {
+        fetchAppointments(); // Refresh the list
+      } else {
+        // Show backend error message if available
+        alert(result && result.message ? result.message : 'Failed to update appointment status');
+      }
     } catch (err) {
-      alert('Failed to update appointment status');
+      // Show backend error message if available
+      const backendMsg = err?.response?.data?.message;
+      alert(backendMsg ? backendMsg : 'Failed to update appointment status');
       console.error(err);
     }
   };
@@ -96,6 +115,7 @@ const UserDashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
+      {info && <Alert severity="info" sx={{ mb: 2 }}>{info}</Alert>}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h3" color="primary" gutterBottom>
