@@ -22,12 +22,16 @@ pipeline {
         // }
         stage('Backend Build') {
             steps {
-                sh './smart-appointment-booking-full/backend/mvnw clean install -DskipTests'
+                dir('smart-appointment-booking-full/backend') {
+                    sh './mvnw clean package -DskipTests'
+                }
             }
         }
         stage('Backend Test') {
             steps {
-                sh './smart-appointment-booking-full/backend/mvnw test'
+                dir('smart-appointment-booking-full/backend') {
+                    sh './mvnw test'
+                }
             }
         }
         stage('Frontend Build') {
@@ -38,13 +42,14 @@ pipeline {
         }
         stage('SonarCloud Analysis') {
             steps {
-                withSonarQubeEnv('SonarCloud') {
-                    sh "./smart-appointment-booking-full/backend/mvnw sonar:sonar \
-                       -Dsonar.organization=nilayshekhar \
-                       -Dsonar.projectKey=nilayshekhar_devops \
-                       -Dsonar.projectName=nilayshekhar_devops \
-                       -Dsonar.host.url=https://sonarcloud.io \
-                       -Dsonar.login=$SONAR_TOKEN"
+                dir('smart-appointment-booking-full/backend') {
+                    withSonarQubeEnv('SonarCloud') {
+                        sh "./mvnw sonar:sonar \
+                            -Dsonar.organization=nilayshekhar \
+                            -Dsonar.projectKey=nilayshekhar_devops \
+                            -Dsonar.projectName=nilayshekhar_devops \
+                            -Dsonar.host.url=https://sonarcloud.io \
+                            -Dsonar.login=$SONAR_TOKEN"
                 }
             }
         }
