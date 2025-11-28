@@ -88,7 +88,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Selenium and WebDriver dependencies -->
+			<!-- Selenium and WebDriver dependencies -->
+			<!-- Logstash Logback Encoder for JSON logging -->
+			<dependency>
+				<groupId>net.logstash.logback</groupId>
+				<artifactId>logstash-logback-encoder</artifactId>
+				<version>7.4</version>
+			</dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>

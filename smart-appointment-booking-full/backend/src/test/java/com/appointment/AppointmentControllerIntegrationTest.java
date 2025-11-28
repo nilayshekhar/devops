@@ -67,11 +67,11 @@ class AppointmentControllerIntegrationTest {
         request.setServiceType(Appointment.ServiceType.DOCTOR);
         request.setAppointmentDateTime(LocalDateTime.now().plusDays(1));
 
-        ResponseEntity<String> postResponse = restTemplate.postForEntity("/api/appointments", request, String.class);
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/api/v1/appointments", request, String.class);
         assertEquals(HttpStatus.CREATED, postResponse.getStatusCode());
         assertTrue(postResponse.getBody().contains("Appointment created successfully"));
 
-        ResponseEntity<String> getResponse = restTemplate.getForEntity("/api/appointments", String.class);
+        ResponseEntity<String> getResponse = restTemplate.getForEntity("/api/v1/appointments", String.class);
         assertEquals(HttpStatus.OK, getResponse.getStatusCode());
         assertTrue(getResponse.getBody().contains("John Doe"));
     }

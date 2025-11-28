@@ -33,7 +33,7 @@ class AppointmentControllerTest {
 	@Test
 	void testUpdateAppointment_Valid() throws Exception {
 		when(appointmentService.updateAppointment(eq(1L), any(AppointmentRequest.class))).thenReturn(appointmentResponse);
-		mockMvc.perform(put("/api/appointments/1")
+		mockMvc.perform(put("/api/v1/appointments/1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(appointmentRequest)))
 			.andExpect(status().isOk())
@@ -43,7 +43,7 @@ class AppointmentControllerTest {
 	@Test
 	void testUpdateAppointment_InvalidId() throws Exception {
 		when(appointmentService.updateAppointment(eq(99L), any(AppointmentRequest.class))).thenThrow(new com.appointment.exception.ResourceNotFoundException("Appointment not found"));
-		mockMvc.perform(put("/api/appointments/99")
+		mockMvc.perform(put("/api/v1/appointments/99")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(appointmentRequest)))
 			.andExpect(status().isNotFound());
@@ -51,7 +51,7 @@ class AppointmentControllerTest {
 
 	@Test
 	void testDeleteAppointment_Valid() throws Exception {
-		mockMvc.perform(delete("/api/appointments/1"))
+		mockMvc.perform(delete("/api/v1/appointments/1"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true));
 	}
@@ -59,14 +59,14 @@ class AppointmentControllerTest {
 	@Test
 	void testDeleteAppointment_InvalidId() throws Exception {
 		doThrow(new com.appointment.exception.ResourceNotFoundException("Appointment not found")).when(appointmentService).deleteAppointment(99L);
-		mockMvc.perform(delete("/api/appointments/99"))
+		mockMvc.perform(delete("/api/v1/appointments/99"))
 			.andExpect(status().isNotFound());
 	}
 
 	@Test
 	void testCreateAppointment_InvalidProvider() throws Exception {
 		when(appointmentService.createAppointment(any(AppointmentRequest.class))).thenThrow(new com.appointment.exception.AppointmentException("Selected user is not a service provider"));
-		mockMvc.perform(post("/api/appointments")
+		mockMvc.perform(post("/api/v1/appointments")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(appointmentRequest)))
 			.andExpect(status().isBadRequest());
@@ -108,7 +108,7 @@ class AppointmentControllerTest {
 		List<AppointmentResponse> appointments = Arrays.asList(appointmentResponse);
 		when(appointmentService.getAllAppointments()).thenReturn(appointments);
 
-		mockMvc.perform(get("/api/appointments"))
+		mockMvc.perform(get("/api/v1/appointments"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data[0].customerName").value("John Doe"));
@@ -118,7 +118,7 @@ class AppointmentControllerTest {
 	void testGetAppointmentById() throws Exception {
 		when(appointmentService.getAppointmentById(1L)).thenReturn(appointmentResponse);
 
-		mockMvc.perform(get("/api/appointments/1"))
+		mockMvc.perform(get("/api/v1/appointments/1"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.customerName").value("John Doe"));
@@ -128,7 +128,7 @@ class AppointmentControllerTest {
 	void testCreateAppointment() throws Exception {
 		when(appointmentService.createAppointment(any(AppointmentRequest.class))).thenReturn(appointmentResponse);
 
-			mockMvc.perform(post("/api/appointments")
+			mockMvc.perform(post("/api/v1/appointments")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(appointmentRequest)))
 				.andExpect(status().isCreated())

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-appointment-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smart-appointment-frontend
+  template:
+    metadata:
+      labels:
+        app: smart-appointment-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nilayshekhar/smart-appointment-frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80

@@ -69,17 +69,17 @@ class BusinessFlowIntegrationTest {
         request.setServiceType(Appointment.ServiceType.DOCTOR);
         request.setAppointmentDateTime(LocalDateTime.now().plusDays(2));
 
-        ResponseEntity<String> postResponse = restTemplate.postForEntity("/api/appointments", request, String.class);
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/api/v1/appointments", request, String.class);
         assertEquals(HttpStatus.CREATED, postResponse.getStatusCode());
         assertTrue(postResponse.getBody().contains("Appointment created successfully"));
 
         // Get appointments by customer
-        ResponseEntity<String> getCustomerResponse = restTemplate.getForEntity("/api/appointments/customer/" + customer.getId(), String.class);
+        ResponseEntity<String> getCustomerResponse = restTemplate.getForEntity("/api/v1/appointments/customer/" + customer.getId(), String.class);
         assertEquals(HttpStatus.OK, getCustomerResponse.getStatusCode());
         assertTrue(getCustomerResponse.getBody().contains("Jane Customer"));
 
         // Get appointments by provider
-        ResponseEntity<String> getProviderResponse = restTemplate.getForEntity("/api/appointments/provider/" + provider.getId(), String.class);
+        ResponseEntity<String> getProviderResponse = restTemplate.getForEntity("/api/v1/appointments/provider/" + provider.getId(), String.class);
         assertEquals(HttpStatus.OK, getProviderResponse.getStatusCode());
         assertTrue(getProviderResponse.getBody().contains("Dr. Provider"));
     }

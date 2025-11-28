@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-appointment-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smart-appointment-backend
+  template:
+    metadata:
+      labels:
+        app: smart-appointment-backend
+    spec:
+      containers:
+      - name: backend
+        image: nilayshekhar/smart-appointment-backend:latest
+        imagePullPolicy: Always
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://smart-appointment-db:5432/appointmentdb"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "postgres"
+        ports:
+        - containerPort: 8080

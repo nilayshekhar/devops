@@ -31,7 +31,7 @@ class UserControllerTest {
   @Test
   void testUpdateUser_Valid() throws Exception {
     when(userService.updateUser(eq(1L), any(UserRequest.class))).thenReturn(userResponse);
-    mockMvc.perform(put("/api/users/1")
+    mockMvc.perform(put("/api/v1/users/1")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(userRequest)))
       .andExpect(status().isOk())
@@ -41,7 +41,7 @@ class UserControllerTest {
   @Test
   void testUpdateUser_InvalidId() throws Exception {
     when(userService.updateUser(eq(99L), any(UserRequest.class))).thenThrow(new com.appointment.exception.ResourceNotFoundException("User not found"));
-    mockMvc.perform(put("/api/users/99")
+    mockMvc.perform(put("/api/v1/users/99")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(userRequest)))
       .andExpect(status().isNotFound());
@@ -49,7 +49,7 @@ class UserControllerTest {
 
   @Test
   void testDeleteUser_Valid() throws Exception {
-    mockMvc.perform(delete("/api/users/1"))
+    mockMvc.perform(delete("/api/v1/users/1"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.success").value(true));
   }
@@ -57,14 +57,14 @@ class UserControllerTest {
   @Test
   void testDeleteUser_InvalidId() throws Exception {
     doThrow(new com.appointment.exception.ResourceNotFoundException("User not found")).when(userService).deleteUser(99L);
-    mockMvc.perform(delete("/api/users/99"))
+    mockMvc.perform(delete("/api/v1/users/99"))
       .andExpect(status().isNotFound());
   }
 
   @Test
   void testCreateUser_EmailExists() throws Exception {
     when(userService.createUser(any(UserRequest.class))).thenThrow(new com.appointment.exception.AppointmentException("Email already registered"));
-    mockMvc.perform(post("/api/users")
+    mockMvc.perform(post("/api/v1/users")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(userRequest)))
       .andExpect(status().isBadRequest());
@@ -102,7 +102,7 @@ class UserControllerTest {
     List<UserResponse> users = Arrays.asList(userResponse);
     when(userService.getAllUsers()).thenReturn(users);
 
-    mockMvc.perform(get("/api/users"))
+    mockMvc.perform(get("/api/v1/users"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.success").value(true))
       .andExpect(jsonPath("$.data[0].name").value("Alice"));
@@ -112,7 +112,7 @@ class UserControllerTest {
   void testGetUserById() throws Exception {
     when(userService.getUserById(1L)).thenReturn(userResponse);
 
-    mockMvc.perform(get("/api/users/1"))
+    mockMvc.perform(get("/api/v1/users/1"))
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.success").value(true))
       .andExpect(jsonPath("$.data.name").value("Alice"));
@@ -122,7 +122,7 @@ class UserControllerTest {
   void testCreateUser() throws Exception {
     when(userService.createUser(any(UserRequest.class))).thenReturn(userResponse);
 
-    mockMvc.perform(post("/api/users")
+    mockMvc.perform(post("/api/v1/users")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(userRequest)))
       .andExpect(status().isCreated())
