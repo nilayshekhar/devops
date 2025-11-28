@@ -4,10 +4,10 @@ pipeline {
         cron('H */3 * * *')   // runs every 3 hours
     }
 
-    tools {
-    jdk 'jdk21'
-        maven 'maven3'
-    }
+    // tools {
+    // jdk 'jdk21'
+    //     maven 'maven3'
+    // }
     environment {
         SONAR_TOKEN = credentials('sonarcloud-token')
         IMAGE_NAME = 'yourdockerhub/image-name'
