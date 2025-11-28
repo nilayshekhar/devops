@@ -106,14 +106,16 @@ pipeline {
     }
     post {
         success {
-            mail to: 'nilayshekhar16@gmail.com',
-                 subject: 'Jenkins Deployment SUCCESS',
-                 body: "Deployment completed successfully and is available at http://your-app-url"
+            // mail to: 'nilayshekhar16@gmail.com',
+            //      subject: 'Jenkins Deployment SUCCESS',
+            //      body: "Deployment completed successfully and is available at http://your-app-url"
+            echo "Build succeeded"
         }
         failure {
-            mail to: 'nilayshekhar16@gmail.com',
-                 subject: 'Jenkins Deployment FAILED',
-                 body: "Deployment failed on Jenkins server."
+            // mail to: 'nilayshekhar16@gmail.com',
+            //      subject: 'Jenkins Deployment FAILED',
+            //      body: "Deployment failed on Jenkins server."
+            echo "Build failed"
         }
     }
 }
