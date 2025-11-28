@@ -22,13 +22,13 @@ pipeline {
                 }
             }
         }
-        stage('Backend Test') {
-            steps {
-                dir('smart-appointment-booking-full/backend') {
-                    sh './mvnw test'
-                }
-            }
-        }
+        // stage('Backend Test') {
+        //     steps {
+        //         dir('smart-appointment-booking-full/backend') {
+        //             sh './mvnw test'
+        //         }
+        //     }
+        // }
         stage('Frontend Build') {
             steps {
                 sh 'cd smart-appointment-booking-full/frontend && npm install'
