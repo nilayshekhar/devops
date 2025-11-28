@@ -1,68 +1,115 @@
 pipeline {
     agent any
-
     triggers {
         cron('H */3 * * *')   // runs every 3 hours
     }
 
+    tools {
+    jdk 'jdk21'
+        maven 'maven3'
+    }
+    environment {
+        SONAR_TOKEN = credentials('sonarcloud-token')
+        IMAGE_NAME = 'yourdockerhub/image-name'
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Git Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/nilayshekhar/devops.git'
             }
         }
-
         stage('Backend Build') {
             steps {
-                sh './smart-appointment-booking-full/backend/mvnw clean install'
+                sh 'mvn -f backend/pom.xml clean install -DskipTests'
             }
         }
-
+        stage('Backend Test') {
+            steps {
+                sh 'mvn -f backend/pom.xml test'
+            }
+        }
         stage('Frontend Build') {
             steps {
-                sh 'cd smart-appointment-booking-full/frontend && npm install'
-                sh 'cd smart-appointment-booking-full/frontend && npm run build'
+                sh 'cd frontend && npm install'
+                sh 'cd frontend && npm run build'
             }
         }
-
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         withSonarQubeEnv('SonarQube') {
-        //             sh './smart-appointment-booking-full/backend/mvnw sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN'
-        //         }
-        //     }
-        // }
-
+        stage('SonarCloud Analysis') {
+            steps {
+                withSonarQubeEnv('SonarCloud') {
+                    sh "mvn -f backend/pom.xml sonar:sonar \
+                       -Dsonar.organization=nilayshekhar \
+                       -Dsonar.projectKey=nilayshekhar_devops \
+                       -Dsonar.projectName=nilayshekhar_devops \
+                       -Dsonar.host.url=https://sonarcloud.io \
+                       -Dsonar.login=$SONAR_TOKEN"
+                }
+            }
+        }
         stage('Docker Build') {
             steps {
-                sh 'cd smart-appointment-booking-full && docker-compose build'
+                script {
+                    echo "Building Docker images..."
+                    sh 'docker version'
+                    withDockerRegistry(credentialsId: 'docker-cred') {
+                        sh "docker-compose build"
+                    }
+                }
             }
         }
-
-        stage('Deploy to EC2') {
+        stage('Docker Push') {
             steps {
-                sshagent(['jenkins-ec2-key']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@ec2-40-192-1-52.ap-south-2.compute.amazonaws.com << EOF
-                        cd devops/smart-appointment-booking-full
-                        git pull
-                        docker compose up -d --build
-                        EOF
-                    '''
+                script {
+                    echo "Pushing images to DockerHub..."
+                    withDockerRegistry(credentialsId: 'docker-cred') {
+                        sh "docker push nilayshekhar/smart-appointment-backend:latest"
+                        sh "docker push nilayshekhar/smart-appointment-frontend:latest"
+                    }
+                }
+            }
+        }
+        stage('Update Kubernetes Manifests') {
+            steps {
+                script {
+                    echo "Substituting Docker image tag in k8s YAML..."
+                    sh "sed -i 's@IMAGE_NAME@nilayshekhar/smart-appointment-backend:latest@g' k8s/backend-deployment.yaml"
+                    sh "sed -i 's@IMAGE_NAME@nilayshekhar/smart-appointment-frontend:latest@g' k8s/frontend-deployment.yaml"
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    echo "Applying Kubernetes Deployment..."
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/backend-deployment.yaml --validate=false"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/backend-service.yaml --validate=false"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/frontend-deployment.yaml --validate=false"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/frontend-service.yaml --validate=false"
+                    echo "Waiting for backend deployment to finish rolling out..."
+                    sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/backend-deployment"
+                    echo "Waiting for frontend deployment to finish rolling out..."
+                    sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/frontend-deployment"
+                }
+            }
+        }
+        stage('Verify Deployment') {
+            steps {
+                script {
+                    sh "kubectl --kubeconfig=${KUBECONFIG} get pods"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} get svc"
                 }
             }
         }
     }
-
     post {
         success {
-            echo 'Deployment successful! Access the app at: http://ec2-40-192-1-52.ap-south-2.compute.amazonaws.com'
             mail to: 'nilayshekhar16@gmail.com',
                  subject: 'Jenkins Deployment SUCCESS',
-                 body: "Deployment completed successfully and is available at http://ec2-40-192-1-52.ap-south-2.compute.amazonaws.com"
+                 body: "Deployment completed successfully and is available at http://your-app-url"
         }
         failure {
-            echo 'Deployment failed.'
             mail to: 'nilayshekhar16@gmail.com',
                  subject: 'Jenkins Deployment FAILED',
                  body: "Deployment failed on Jenkins server."
