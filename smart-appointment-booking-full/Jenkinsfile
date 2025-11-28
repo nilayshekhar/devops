@@ -22,24 +22,24 @@ pipeline {
         // }
         stage('Backend Build') {
             steps {
-                sh 'mvn -f backend/pom.xml clean install -DskipTests'
+                sh './smart-appointment-booking-full/backend/mvnw clean install -DskipTests'
             }
         }
         stage('Backend Test') {
             steps {
-                sh 'mvn -f backend/pom.xml test'
+                sh './smart-appointment-booking-full/backend/mvnw test'
             }
         }
         stage('Frontend Build') {
             steps {
-                sh 'cd frontend && npm install'
-                sh 'cd frontend && npm run build'
+                sh 'cd smart-appointment-booking-full/frontend && npm install'
+                sh 'cd smart-appointment-booking-full/frontend && npm run build'
             }
         }
         stage('SonarCloud Analysis') {
             steps {
                 withSonarQubeEnv('SonarCloud') {
-                    sh "mvn -f backend/pom.xml sonar:sonar \
+                    sh "./smart-appointment-booking-full/backend/mvnw sonar:sonar \
                        -Dsonar.organization=nilayshekhar \
                        -Dsonar.projectKey=nilayshekhar_devops \
                        -Dsonar.projectName=nilayshekhar_devops \
