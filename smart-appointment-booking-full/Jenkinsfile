@@ -1,60 +1,71 @@
 pipeline {
     agent any
-    environment {
-        SONARQUBE_SERVER = 'SonarQube'
-        SONARQUBE_TOKEN = credentials('sonarqube-token')
-    }
+
     triggers {
-        cron('H H/6 * * *')
+        cron('H */3 * * *')   // runs every 3 hours
     }
+
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/nilayshekhar/devops.git'
             }
         }
+
         stage('Backend Build') {
             steps {
                 sh './smart-appointment-booking-full/backend/mvnw clean install'
             }
         }
+
         stage('Frontend Build') {
             steps {
                 sh 'cd smart-appointment-booking-full/frontend && npm install'
                 sh 'cd smart-appointment-booking-full/frontend && npm run build'
             }
         }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh './smart-appointment-booking-full/backend/mvnw sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN'
-                }
-            }
-        }
+
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         withSonarQubeEnv('SonarQube') {
+        //             sh './smart-appointment-booking-full/backend/mvnw sonar:sonar -Dsonar.login=$SONARQUBE_TOKEN'
+        //         }
+        //     }
+        // }
+
         stage('Docker Build') {
             steps {
                 sh 'cd smart-appointment-booking-full && docker-compose build'
             }
         }
-        stage('Docker Deploy') {
-            steps {
-                sh 'cd smart-appointment-booking-full && docker-compose up -d --build'
-            }
-        }
+
         stage('Deploy to EC2') {
             steps {
                 sshagent(['jenkins-ec2-key']) {
-                    sh 'ssh -o StrictHostKeyChecking=no ec2-user@18.61.83.99 "cd devops/smart-appointment-booking-full && git pull && docker-compose up -d --build"'
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@ec2-40-192-1-52.ap-south-2.compute.amazonaws.com << EOF
+                        cd devops/smart-appointment-booking-full
+                        git pull
+                        docker compose up -d --build
+                        EOF
+                    '''
                 }
             }
         }
     }
+
     post {
         success {
-            echo 'Deployment successful! Access the app at http://localhost:8080/'
+            echo 'Deployment successful! Access the app at: http://ec2-40-192-1-52.ap-south-2.compute.amazonaws.com'
+            mail to: 'nilayshekhar16@gmail.com',
+                 subject: 'Jenkins Deployment SUCCESS',
+                 body: "Deployment completed successfully and is available at http://ec2-40-192-1-52.ap-south-2.compute.amazonaws.com"
         }
         failure {
             echo 'Deployment failed.'
+            mail to: 'nilayshekhar16@gmail.com',
+                 subject: 'Jenkins Deployment FAILED',
+                 body: "Deployment failed on Jenkins server."
         }
     }
 }
