@@ -15,11 +15,6 @@ pipeline {
     }
 
     stages {
-        // stage('Git Checkout') {
-        //     steps {
-        //         git branch: 'main', url: 'https://github.com/nilayshekhar/devops.git'
-        //     }
-        // }
         stage('Backend Build') {
             steps {
                 dir('smart-appointment-booking-full/backend') {
@@ -50,6 +45,7 @@ pipeline {
                             -Dsonar.projectName=nilayshekhar_devops \
                             -Dsonar.host.url=https://sonarcloud.io \
                             -Dsonar.login=$SONAR_TOKEN"
+                    }
                 }
             }
         }
