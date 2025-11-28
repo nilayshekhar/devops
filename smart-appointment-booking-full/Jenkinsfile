@@ -31,8 +31,10 @@ pipeline {
         // }
         stage('Frontend Build') {
             steps {
-                sh 'cd smart-appointment-booking-full/frontend && npm install'
-                sh 'cd smart-appointment-booking-full/frontend && npm run build'
+                dir('smart-appointment-booking-full/frontend') {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
             }
         }
         stage('SonarCloud Analysis') {
