@@ -15,11 +15,11 @@ pipeline {
     }
 
     stages {
-        stage('Git Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/nilayshekhar/devops.git'
-            }
-        }
+        // stage('Git Checkout') {
+        //     steps {
+        //         git branch: 'main', url: 'https://github.com/nilayshekhar/devops.git'
+        //     }
+        // }
         stage('Backend Build') {
             steps {
                 sh 'mvn -f backend/pom.xml clean install -DskipTests'
