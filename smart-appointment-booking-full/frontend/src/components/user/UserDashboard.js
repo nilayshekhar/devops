@@ -15,11 +15,7 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [info, setInfo] = useState('');
 
-  useEffect(() => {
-    fetchAppointments(); // Fetch appointments when user changes
-  }, [user, fetchAppointments]);
-
-  const fetchAppointments = async () => {
+  const fetchAppointments = React.useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -61,7 +57,11 @@ const UserDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, isServiceProvider]);
+
+  useEffect(() => {
+    fetchAppointments(); // Fetch appointments when user changes
+  }, [fetchAppointments]);
 
   const handleCancelAppointment = async (id) => {
     if (window.confirm('Are you sure you want to cancel this appointment?')) {

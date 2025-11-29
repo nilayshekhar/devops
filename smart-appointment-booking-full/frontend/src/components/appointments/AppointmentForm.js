@@ -30,7 +30,7 @@ const AppointmentForm = () => {
       }
     };
     fetchProvidersAndAppointment();
-  }, [id, isEditMode]);
+  }, [id, isEditMode, fetchAppointment]);
 
   const fetchProviders = async () => {
     try {
