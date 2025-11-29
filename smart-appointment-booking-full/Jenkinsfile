@@ -57,7 +57,7 @@ pipeline {
                     echo "Building Docker images..."
                     sh 'docker version'
                     withDockerRegistry(credentialsId: 'docker-cred') {
-                        sh "docker-compose build"
+                        sh "docker compose build"
                     }
                 }
             }
