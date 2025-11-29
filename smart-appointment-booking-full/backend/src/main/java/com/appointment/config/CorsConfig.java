@@ -15,8 +15,6 @@ public class CorsConfig {
         registry.addMapping("/**")
             .allowedOrigins(
                 "http://localhost:3000",
-                "http://18.61.253.86:3000",
-                "http://18.61.253.86:8080",
                 "http://18.60.44.0:3000",
                 "http://ec2-18-60-44-0.ap-south-2.compute.amazonaws.com:3000",
                 "http://18.60.44.0:8080",
