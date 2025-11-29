@@ -27,7 +27,7 @@ const AppointmentForm = () => {
     if (isEditMode) {
       fetchAppointment();
     }
-  }, [id]);
+  }, [id, fetchAppointment, isEditMode]);
 
   const fetchProviders = async () => {
     try {
