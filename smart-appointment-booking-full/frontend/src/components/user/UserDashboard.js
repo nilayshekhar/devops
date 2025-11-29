@@ -17,7 +17,7 @@ const UserDashboard = () => {
 
   useEffect(() => {
     fetchAppointments(); // Fetch appointments when user changes
-  }, [user]);
+  }, [user, fetchAppointments]);
 
   const fetchAppointments = async () => {
     try {

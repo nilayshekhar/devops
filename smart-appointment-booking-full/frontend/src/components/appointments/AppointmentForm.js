@@ -23,11 +23,14 @@ const AppointmentForm = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchProviders();
-    if (isEditMode) {
-      fetchAppointment();
-    }
-  }, [id, fetchAppointment, isEditMode]);
+    const fetchProvidersAndAppointment = async () => {
+      await fetchProviders();
+      if (isEditMode) {
+        await fetchAppointment();
+      }
+    };
+    fetchProvidersAndAppointment();
+  }, [id, isEditMode]);
 
   const fetchProviders = async () => {
     try {
