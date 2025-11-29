@@ -34,7 +34,7 @@ public class SwaggerConfig {
           .url("https://opensource.org/licenses/MIT")))
       .servers(List.of(
         new Server().url("http://localhost:8080").description("Local Development Server"),
-        new Server().url("http://18.61.253.86:8080").description("Production Server")
+        new Server().url("\"http://ec2-18-60-44-0.ap-south-2.compute.amazonaws.com:8080").description("Production Server")
       ));
   }
 }

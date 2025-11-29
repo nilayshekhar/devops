@@ -10,8 +10,8 @@ pipeline {
     // }
     environment {
         SONAR_TOKEN = credentials('sonarcloud-token')
-        IMAGE_NAME = 'yourdockerhub/image-name'
-        KUBECONFIG = "/var/lib/jenkins/.kube/config"
+        // IMAGE_NAME = 'yourdockerhub/image-name'
+        // KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
@@ -52,58 +52,58 @@ pipeline {
             }
         }
         // Removed redundant Docker Build stage
-        stage('Docker Build and Deploy') {
-            steps {
-                dir('smart-appointment-booking-full') {
-                    sh 'docker compose build'
-                    sh 'docker compose up -d'
-                }
-            }
-        }
-        stage('Docker Push') {
-            steps {
-                script {
-                    echo "Pushing images to DockerHub..."
-                    withDockerRegistry(credentialsId: 'docker-cred') {
-                        sh "docker push nilayshekhar/smart-appointment-backend:latest"
-                        sh "docker push nilayshekhar/smart-appointment-frontend:latest"
-                    }
-                }
-            }
-        }
-        stage('Update Kubernetes Manifests') {
-            steps {
-                script {
-                    echo "Substituting Docker image tag in k8s YAML..."
-                    sh "sed -i 's@IMAGE_NAME@nilayshekhar/smart-appointment-backend:latest@g' k8s/backend-deployment.yaml"
-                    sh "sed -i 's@IMAGE_NAME@nilayshekhar/smart-appointment-frontend:latest@g' k8s/frontend-deployment.yaml"
-                }
-            }
-        }
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    echo "Applying Kubernetes Deployment..."
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/backend-deployment.yaml --validate=false"
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/backend-service.yaml --validate=false"
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/frontend-deployment.yaml --validate=false"
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/frontend-service.yaml --validate=false"
-                    echo "Waiting for backend deployment to finish rolling out..."
-                    sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/backend-deployment"
-                    echo "Waiting for frontend deployment to finish rolling out..."
-                    sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/frontend-deployment"
-                }
-            }
-        }
-        stage('Verify Deployment') {
-            steps {
-                script {
-                    sh "kubectl --kubeconfig=${KUBECONFIG} get pods"
-                    sh "kubectl --kubeconfig=${KUBECONFIG} get svc"
-                }
-            }
-        }
-    }
+        // stage('Docker Build and Deploy') {
+        //     steps {
+        //         dir('smart-appointment-booking-full') {
+        //             sh 'docker compose build'
+        //             sh 'docker compose up -d'
+        //         }
+        //     }
+        // }
+        // stage('Docker Push') {
+        //     steps {
+        //         script {
+        //             echo "Pushing images to DockerHub..."
+        //             withDockerRegistry(credentialsId: 'docker-cred') {
+        //                 sh "docker push nilayshekhar/smart-appointment-backend:latest"
+        //                 sh "docker push nilayshekhar/smart-appointment-frontend:latest"
+        //             }
+        //         }
+        //     }
+        // }
+        // stage('Update Kubernetes Manifests') {
+        //     steps {
+        //         script {
+        //             echo "Substituting Docker image tag in k8s YAML..."
+        //             sh "sed -i 's@IMAGE_NAME@nilayshekhar/smart-appointment-backend:latest@g' k8s/backend-deployment.yaml"
+        //             sh "sed -i 's@IMAGE_NAME@nilayshekhar/smart-appointment-frontend:latest@g' k8s/frontend-deployment.yaml"
+        //         }
+        //     }
+        // }
+    //     stage('Deploy to Kubernetes') {
+    //         steps {
+    //             script {
+    //                 echo "Applying Kubernetes Deployment..."
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/backend-deployment.yaml --validate=false"
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/backend-service.yaml --validate=false"
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/frontend-deployment.yaml --validate=false"
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} apply -f k8s/frontend-service.yaml --validate=false"
+    //                 echo "Waiting for backend deployment to finish rolling out..."
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/backend-deployment"
+    //                 echo "Waiting for frontend deployment to finish rolling out..."
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/frontend-deployment"
+    //             }
+    //         }
+    //     }
+    //     stage('Verify Deployment') {
+    //         steps {
+    //             script {
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} get pods"
+    //                 sh "kubectl --kubeconfig=${KUBECONFIG} get svc"
+    //             }
+    //         }
+    //     }
+    // }
     post {
         success {
             // mail to: 'nilayshekhar16@gmail.com',
