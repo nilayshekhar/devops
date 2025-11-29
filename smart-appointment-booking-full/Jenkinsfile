@@ -51,14 +51,12 @@ pipeline {
                 }
             }
         }
-        stage('Docker Build') {
+        // Removed redundant Docker Build stage
+        stage('Docker Build and Deploy') {
             steps {
-                script {
-                    echo "Building Docker images..."
-                    sh 'docker version'
-                    withDockerRegistry(credentialsId: 'docker-cred') {
-                        sh "docker compose build"
-                    }
+                dir('smart-appointment-booking-full') {
+                    sh 'docker compose build'
+                    sh 'docker compose up -d'
                 }
             }
         }
