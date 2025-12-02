@@ -130,7 +130,7 @@ Service providers and customers need a seamless, reliable, and secure way to man
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/BITSSAP2025AugAPIBP3Sections/APIBP-20234YC-Team-15.git
+   git clone https://github.com/nilayshekhar/devops.git
    cd APIBP-20234YC-Team-15
    ```
 
